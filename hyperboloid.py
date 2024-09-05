@@ -69,7 +69,7 @@ def exp(base, vector):
 
     vector_norm = np.sqrt(minkowski_dot(vector, vector))[..., np.newaxis]
 
-    vector_norm_modified = np.clip(vector_norm, 1e-10, None)
+    vector_norm_modified = np.clip(vector_norm, 1e-5, None)
 
     vector_unit = vector / vector_norm_modified
 
@@ -160,19 +160,23 @@ def random_uniform(base = None, n_samples = 1, radius = 1):
 
 # ---------------------- Fr\'echet mean ---------------------- #
 
-def frechet_mean(data, stepsize = 0.01, tol = 1e-6, max_iter = 100):
+def frechet_mean(data, stepsize = 0.01, tol = 1e-6, max_iter = 200):
 
     # data is 2D and the output shape is 1D
 
     # output the Frechet mean of the data
 
-    mean = data[0, :]
+    data_poincare = hyperboloid_to_poincare_ball(data)
+
+    mean_poincare = np.mean(data_poincare, axis = 0)
+
+    mean = poincare_ball_to_hyperboloid(mean_poincare)
 
     for _ in range(max_iter):
 
         gradient = np.mean(log(mean, data), axis = 0)
 
-        mean_new = exp(mean, - stepsize * gradient)
+        mean_new = exp(mean, stepsize * gradient)
 
         if np.linalg.norm(mean - mean_new) < tol:
 
