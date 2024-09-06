@@ -121,14 +121,6 @@ def random_riemannian_gaussian(base = None, n_samples = 1, sigma = 1):
 
         return quad(lambda t: np.exp(- np.arcsinh(t) ** 2 / (2 * sigma)) * t ** (dim_embedded - 2) * np.sqrt(1 + t ** 2), 0, x)[0] - u
 
-    #def root_finding(u):
-
-    #    return root_scalar(integral, args = (u,), bracket = [0, 10]).root
-    
-    #root_finding_vectorized = np.vectorize(root_finding)
-
-    #roots = root_finding_vectorized(random_U)
-
     roots = np.array([root_scalar(integral, args = (u,), bracket = [0, 10]).root for u in random_U])
 
     vectors = directions_tangent * np.arcsinh(roots)[..., np.newaxis]
@@ -160,7 +152,7 @@ def random_uniform(base = None, n_samples = 1, radius = 1):
 
 # ---------------------- Fr\'echet mean ---------------------- #
 
-def frechet_mean(data, stepsize = 0.01, tol = 1e-6, max_iter = 200):
+def frechet_mean(data, stepsize = 0.1, tol = 1e-6, max_iter = 100):
 
     # data is 2D and the output shape is 1D
 
@@ -174,9 +166,9 @@ def frechet_mean(data, stepsize = 0.01, tol = 1e-6, max_iter = 200):
 
     for _ in range(max_iter):
 
-        gradient = np.mean(log(mean, data), axis = 0)
+        minus_gradient = np.mean(log(mean, data), axis = 0)
 
-        mean_new = exp(mean, stepsize * gradient)
+        mean_new = exp(mean, stepsize * minus_gradient)
 
         if np.linalg.norm(mean - mean_new) < tol:
 
@@ -209,13 +201,13 @@ def visualize(data, transform_to_poincare_ball = True):
 
         data = hyperboloid_to_poincare_ball(data)
 
-    _, ax = plt.subplots()
+    _, ax = plt.subplots(figsize = (5, 5))
 
     circle = plt.Circle((0, 0), 1, fill = False, edgecolor = 'black', lw = 2)
 
     ax.add_patch(circle)
 
-    ax.scatter(data[:, 0], data[:, 1], color = 'black', s = 10, label = 'Points')
+    ax.scatter(data[:, 0], data[:, 1], color = 'black', s = 40, label = 'Local states')
 
     ax.axis('equal')
 
@@ -223,7 +215,5 @@ def visualize(data, transform_to_poincare_ball = True):
     
     ax.set_ylim(-1.02, 1.02)
 
-    ax.axis('off')
-
-    plt.legend()
+    ax.axis('off') 
  
