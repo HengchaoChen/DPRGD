@@ -37,7 +37,7 @@ def check_dim(base, vector):
 
 # ---------------------- Symmetric positive definite space ---------------------- #
 
-def dist(base, target):
+def dist(base, target, epsilon = 1e-10):
 
     # input case 1 : 2D base and 3D vector
 
@@ -45,17 +45,23 @@ def dist(base, target):
 
     base, target = check_dim(base, target)
 
-    base_sqrt = np.linalg.cholesky(base)
+    #eigvals, eigvecs = np.linalg.eigh(base)
 
-    base_sqrt_inv = np.linalg.inv(base_sqrt)
+    #eigvals = np.maximum(eigvals, epsilon)
 
-    inner_log = np.einsum('nij,njk,nkl->nil', base_sqrt_inv, target, base_sqrt_inv)
+    #base_sqrt_inv = np.einsum('nij,nj,nkj->nik', eigvecs, 1 / np.sqrt(eigvals), eigvecs)
+
+    #inner_log = np.einsum('nij,njk,nkl->nil', base_sqrt_inv, target, base_sqrt_inv)
+
+    inv_base = np.linalg.ginv(base)
+
+    inner_log = np.einsum('nij,njk->nik', inv_base, target)
 
     log_inner = np.array([logm(m) for m in inner_log])
 
     return np.linalg.norm(log_inner, axis = (1, 2))
 
-def exp(base, vector):
+def exp(base, vector, epsilon = 1e-10):
 
     # input case 1 : 2D base and 3D vector or 2D vector
 
@@ -71,9 +77,17 @@ def exp(base, vector):
 
     base, vector = check_dim(base, vector)
 
-    base_sqrt = np.linalg.cholesky(base)
+    # ensure symmetry
 
-    base_sqrt_inv = np.linalg.inv(base_sqrt)
+    vector = (vector + vector.transpose(0, 2, 1)) / 2 
+
+    eigvals, eigvecs = np.linalg.eigh(base)
+
+    base_sqrt = np.einsum('nij,nj,nkj->nik', eigvecs, np.sqrt(eigvals), eigvecs)
+
+    #eigvals = np.maximum(eigvals, epsilon)
+
+    base_sqrt_inv = np.einsum('nij,nj,nkj->nik', eigvecs, 1 / np.sqrt(eigvals), eigvecs)
 
     inner_exp = np.einsum('nij,njk,bkl->nil', base_sqrt_inv, vector, base_sqrt_inv)
 
@@ -87,7 +101,7 @@ def exp(base, vector):
     
     return result
 
-def log(base, target):
+def log(base, target, epsilon = 1e-10):
 
     # input case 1 : 2D base and 3D vector
 
@@ -95,9 +109,13 @@ def log(base, target):
 
     base, target = check_dim(base, target)
 
-    base_sqrt = np.linalg.cholesky(base)
+    eigvals, eigvecs = np.linalg.eigh(base)
 
-    base_sqrt_inv = np.linalg.inv(base_sqrt)
+    base_sqrt = np.einsum('nij,nj,nkj->nik', eigvecs, np.sqrt(eigvals), eigvecs)
+
+    #eigvals = np.maximum(eigvals, epsilon)
+
+    base_sqrt_inv = np.einsum('nij,nj,nkj->nik', eigvecs, 1 / np.sqrt(eigvals), eigvecs)
 
     inner_log = np.einsum('nij,njk,nkl->nil', base_sqrt_inv, target, base_sqrt_inv)
 
