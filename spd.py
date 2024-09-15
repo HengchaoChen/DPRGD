@@ -53,7 +53,7 @@ def dist(base, target, epsilon = 1e-10):
 
     #inner_log = np.einsum('nij,njk,nkl->nil', base_sqrt_inv, target, base_sqrt_inv)
 
-    inv_base = np.linalg.ginv(base)
+    inv_base = np.linalg.pinv(base)
 
     inner_log = np.einsum('nij,njk->nik', inv_base, target)
 
