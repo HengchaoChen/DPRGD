@@ -5,3 +5,14 @@ This is a repository for the paper *Decentralized Online Riemannian Optimization
 
 1. hyperboloid.py and spd.py provide basic functions for hyperbolic spaces and the space of SPD matrices.
 4. DPRGD.ipynb collects all the experiments.
+
+## Citation
+
+```
+@article{chen2024decentralized,
+  title={Decentralized Online Riemannian Optimization with Dynamic Environments},
+  author={Chen, Hengchao and Sun, Qiang},
+  journal={arXiv preprint arXiv:2410.05128},
+  year={2024}
+}
+```
