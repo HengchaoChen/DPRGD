@@ -1,7 +1,7 @@
 # Decentralized Projected Riemannian Gradient Descent (DPRGD)
 This is a repository for the paper *Decentralized Online Riemannian Optimization with Dynamic Environments*. Our experiments cover two Hadamard manifolds: hyperbolic spaces and the space of symmetric prositive definite (SPD) matrices. 
 
-## Introduction to the files
+## Getting Started
 
 1. hyperboloid.py and spd.py provide basic functions for hyperbolic spaces and the space of SPD matrices.
 4. DPRGD.ipynb collects all the experiments.
