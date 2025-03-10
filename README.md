@@ -1,5 +1,5 @@
 # Decentralized Projected Riemannian Gradient Descent (DPRGD)
-This is a repository for the paper *Decentralized Online Riemannian Optimization with Dynamic Environments*. 
+This repo contains the code for the paper *Decentralized Online Riemannian Optimization with Dynamic Environments*. 
 - Our simulation studies cover hyperbolic spaces and the space of symmetric prositive definite (SPD) matrices. 
 - Our data applications involves environmental monitoring using the FLUXNET2015 dataset.
 
