@@ -8,7 +8,8 @@ import pandas as pd
 
 zip_dir = 'data/zip'
 extract_dir = 'data/raw'
-selected_columns = ['TIMESTAMP_START', 'TA_F', 'PA_F', 'P_F', 'WS_F', 'CO2_F_MDS', 'VPD_F']
+cols = ['TA_F', 'PA_F', 'P_F', 'WS_F', 'CO2_F_MDS', 'VPD_F']
+selected_columns = ['TIMESTAMP_START'] + cols
 
 zip_files = glob.glob(zip_dir + '/*.zip')
 
@@ -23,8 +24,8 @@ for zip_file in zip_files:
                     
                     start = df['TIMESTAMP_START'].min()
                     end = df['TIMESTAMP_START'].max() 
-                    if start <= 201001010000 and end >= 201312312330:
-                        df = df[(df['TIMESTAMP_START'] >= 201001010000) & (df['TIMESTAMP_START'] <= 201312312330)]
-                        df.to_csv(extract_dir + '/' + file, index=False)
-
+                    df = df[(df['TIMESTAMP_START'] >= 201001010000) & (df['TIMESTAMP_START'] <= 201312312330)]
+                    missing = min(df[cols].min()) <= -9999
+                    if start <= 201001010000 and end >= 201312312330 and not missing: 
+                        df.to_csv(extract_dir + '/' + file, index=False) 
                         print(f"Extracted {file} to {extract_dir}")
