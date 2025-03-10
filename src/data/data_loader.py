@@ -5,6 +5,7 @@ import os
 import zipfile
 import glob
 import pandas as pd
+from tqdm import tqdm
 
 zip_dir = 'data/zip'
 extract_dir = 'data/raw'
@@ -15,10 +16,10 @@ zip_files = glob.glob(zip_dir + '/*.zip')
 
 os.makedirs(extract_dir, exist_ok=True)
 
-for zip_file in zip_files:
+for zip_file in tqdm(zip_files):
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
         for file in zip_ref.namelist():
-            if "_HH_" in file and 'FLX_US' in file and file.endswith(".csv"):
+            if "_HH_" in file and file.endswith(".csv"):
                 with zip_ref.open(file) as f:
                     df = pd.read_csv(f, usecols = selected_columns) 
                     

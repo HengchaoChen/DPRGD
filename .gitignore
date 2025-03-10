@@ -4,13 +4,27 @@
 # csv files
 *.csv
 
-# pdf files
-*.pdf
-
 # cache files
 __pycache__/
+*.py[cod]
+*$PYTHONHASHSEED
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# virtual environment
+venv/
+env/
+*.venv/
+
+# logs
+logs/
+*.log
 
 # compiled output
-*.pyc
+*.so
 *.o
-*.class 
+*.a
+*.out
+*.exe
+*.pyc
