@@ -13,10 +13,15 @@ conda activate opt
 pip install -r requirements.txt
 ```
 
-Download [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/) into the folder data/zip and run the following code to unzip and preprocess data.
+Download [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/) into the folder data/zip and run the following code to unzip, select, and store raw data into data/raw.
 
 ```
 python src/data/data_loader.py
+```
+
+Transform raw data into weekly correlation matrices and stored the processed data into data/processed.
+
+```
 python src/data/data_processor.py
 ```
 
