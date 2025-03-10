@@ -1,0 +1,10 @@
+# zip files
+*.zip
+
+# csv files
+*.csv
+
+# compiled output
+*.pyc
+*.o
+*.class
