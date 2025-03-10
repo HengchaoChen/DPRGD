@@ -21,9 +21,8 @@ python src/data_processing/data_loader.py
 
 ## Files
 
-1. hyperboloid.py and spd.py in src/utils provide basic functions for hyperbolic spaces and the space of SPD matrices.
-2. simulation.ipynb presents all the simulation experiments.
-3. data.ipynb presents real data analysis using [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/)
+1. simulation.ipynb contains the simulation experiments
+2. data.ipynb contains real data analysis using the [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/)
 
 ## Citation
 
