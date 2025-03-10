@@ -21,8 +21,8 @@ python src/data_processing/data_loader.py
 
 ## Files
 
-1. simulation.ipynb contains the simulation experiments
-2. data.ipynb contains real data analysis using the [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/)
+- simulation.ipynb contains the simulation experiments
+- data.ipynb contains real data analysis using the [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/)
 
 ## Citation
 
