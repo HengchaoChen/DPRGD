@@ -1,5 +1,7 @@
 # Decentralized Projected Riemannian Gradient Descent (DPRGD)
-This is a repository for the paper *Decentralized Online Riemannian Optimization with Dynamic Environments*. Our experiments cover two Hadamard manifolds: hyperbolic spaces and the space of symmetric prositive definite (SPD) matrices. Besides simulation, we also apply our DPRGD algorithm to environmental monitoring using the FLUXNET2015 dataset.
+This is a repository for the paper *Decentralized Online Riemannian Optimization with Dynamic Environments*. 
+- Our experiments cover two Hadamard manifolds: hyperbolic spaces and the space of symmetric prositive definite (SPD) matrices. 
+- We also apply our DPRGD algorithm to environmental monitoring using the FLUXNET2015 dataset.
 
 ## Getting Started
 
