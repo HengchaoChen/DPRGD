@@ -10,4 +10,4 @@ __pycache__/
 # compiled output
 *.pyc
 *.o
-*.class
+*.class 

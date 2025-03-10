@@ -1,5 +1,5 @@
 # Decentralized Projected Riemannian Gradient Descent (DPRGD)
-This is a repository for the paper *Decentralized Online Riemannian Optimization with Dynamic Environments*. Our experiments cover two Hadamard manifolds: hyperbolic spaces and the space of symmetric prositive definite (SPD) matrices. 
+This is a repository for the paper *Decentralized Online Riemannian Optimization with Dynamic Environments*. Our experiments cover two Hadamard manifolds: hyperbolic spaces and the space of symmetric prositive definite (SPD) matrices. Besides simulation, we also apply our DPRGD algorithm to environmental monitoring using the FLUXNET2015 dataset.
 
 ## Getting Started
 
@@ -11,9 +11,15 @@ conda activate opt
 pip install -r requirements.txt
 ```
 
+Download [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/) into the folder data/zip and run the following code to unzip and preprocess data.
+
+```
+python src/data_processing/data_loader.py
+```
+
 ## Files
 
-1. hyperboloid.py and spd.py in utils provide basic functions for hyperbolic spaces and the space of SPD matrices.
+1. hyperboloid.py and spd.py in src/utils provide basic functions for hyperbolic spaces and the space of SPD matrices.
 2. simulation.ipynb presents all the simulation experiments.
 3. data.ipynb presents real data analysis using [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/)
 
