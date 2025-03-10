@@ -16,7 +16,8 @@ pip install -r requirements.txt
 Download [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/) into the folder data/zip and run the following code to unzip and preprocess data.
 
 ```
-python src/data_processing/data_loader.py
+python src/data/data_loader.py
+python src/data/data_processor.py
 ```
 
 ## Files
