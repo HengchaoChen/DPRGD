@@ -4,6 +4,9 @@
 # csv files
 *.csv
 
+# cache files
+__pycache__/
+
 # compiled output
 *.pyc
 *.o
