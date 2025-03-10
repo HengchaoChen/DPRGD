@@ -3,6 +3,8 @@ This is a repository for the paper *Decentralized Online Riemannian Optimization
 
 ## Getting Started
 
+Create and activate conda environments and install necessary dependencies.
+
 ```
 conda create --name opt python=3.10
 conda activate opt
