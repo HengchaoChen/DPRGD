@@ -13,7 +13,7 @@ conda activate opt
 pip install -r requirements.txt
 ```
 
-Download [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/) into the folder data/zip and run the following code to unzip and preprocess data. These data are then stored into the folder data/raw.
+Download [FLUXNET2015 dataset](https://fluxnet.org/data/fluxnet2015-dataset/) into the folder data/zip and run the following code to unzip and preprocess data.
 
 ```
 python src/data_processing/data_loader.py
