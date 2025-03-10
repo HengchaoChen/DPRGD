@@ -4,6 +4,9 @@
 # csv files
 *.csv
 
+# pdf files
+*.pdf
+
 # cache files
 __pycache__/
 
