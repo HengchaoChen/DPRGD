@@ -2,6 +2,7 @@ import pandas as pd
 import glob 
 from tqdm import tqdm
 import os 
+import numpy as np
 
 source_dir = "data/raw"
 extract_dir = "data/processed"
@@ -20,4 +21,7 @@ for file in tqdm(files):
     df['week'] = df["TIMESTAMP_START"].dt.to_period("W")
     
     corr = df.groupby("week")[columns].apply(lambda x: x.corr())
-    corr.to_csv(extract_dir + f"/{site}_corr.csv") 
+    determinant = df.groupby("week")[columns].apply(lambda x: np.linalg.det(x.corr())) # compute the determinant of the correlation matrix, and check if it is not NaN
+
+    if not determinant.isna().any().any():
+        corr.to_csv(extract_dir + f"/{site}_corr.csv") 

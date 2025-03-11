@@ -4,6 +4,9 @@
 # csv files
 *.csv
 
+# npy files
+*.npy
+
 # cache files
 __pycache__/
 *.py[cod]
