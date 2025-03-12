@@ -22,6 +22,13 @@ for file in tqdm(files):
     
     corr = df.groupby("week")[columns].apply(lambda x: x.corr())
     determinant = df.groupby("week")[columns].apply(lambda x: np.linalg.det(x.corr())) # compute the determinant of the correlation matrix, and check if it is not NaN
-
+    
     if not determinant.isna().any().any():
         corr.to_csv(extract_dir + f"/{site}_corr.csv") 
+
+    cov = df.groupby("week")[columns].apply(lambda x: x.cov())
+    determinant = df.groupby("week")[columns].apply(lambda x: np.linalg.det(x.cov())) # compute the determinant of the covariance matrix, and check if it is not NaN
+
+    if not determinant.isna().any().any() and np.min(determinant) > 0:
+        cov.to_csv(extract_dir + f"/{site}_cov.csv")
+

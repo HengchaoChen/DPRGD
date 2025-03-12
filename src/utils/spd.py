@@ -1,16 +1,17 @@
 """ 
 Written by: Hengchao Chen
 Version: 0.1
-Last modified date: 2024-09-02
-Description: This file is used to define the module of the space of symmetric positive definite matrices.
+Last modified date: 2025-03-11
+Description: This file is used to define the module of the space of symmetric positive definite (SPD) matrices.
 """
 
 import numpy as np
-from scipy.linalg import expm, logm, sqrtm, norm
+from scipy.linalg import expm, logm, sqrtm 
 
 # ---------------------- check dimension ---------------------- #
 
 def check_dim(base, vector):
+    """Check the dimension of the base and the vector. Convert the 2D matrix to 3D matrix n x dim x dim if necessary."""
 
     if base.ndim == 2 and vector.ndim == 3:
         base = base.reshape(1, base.shape[0], base.shape[1])
@@ -30,10 +31,14 @@ def check_dim(base, vector):
 # ---------------------- Symmetric positive definite space ---------------------- #
 
 def dist(base, target, epsilon = 1e-10): 
-    # input case 1 : 2D base and 3D vector
-    # input case 2 : 3D base and 3D vector
+    """Compute the distance between SPD matrices. 
+    Input: 
+    base : 2D or 3D matrix
+    target : 2D or 3D matrix
+
+    Output: distance between base and target"""
     base, target = check_dim(base, target)   
-    
+
     sqrt_base = np.array([sqrtm(B) for B in base])
     inv_sqrt_base = np.linalg.inv(sqrt_base)
 
