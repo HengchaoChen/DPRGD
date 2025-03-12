@@ -21,7 +21,7 @@ Run the following code to unzip, select, and save raw data into data/raw.
 python src/data/data_loader.py
 ```
 
-Next, we compute weekly correlation matrices and save the processed data into data/processed.
+Next, we compute weekly correlation/covariance matrices and save the processed data into data/processed.
 
 ```
 python src/data/data_processor.py
