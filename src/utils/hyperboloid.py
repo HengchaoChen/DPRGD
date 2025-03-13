@@ -63,10 +63,10 @@ def dist(base, target):
 
 def exp(base, vector):
     base, vector = check_dim(base, vector) 
-    vector_norm = np.sqrt(minkowski_dot(vector, vector))[..., np.newaxis] 
-    vector_norm_modified = np.clip(vector_norm, 1e-5, None) 
-    vector_unit = vector / vector_norm_modified 
-    return np.cosh(vector_norm) * base + np.sinh(vector_norm) * vector_unit
+    vecnorm = np.sqrt(minkowski_dot(vector, vector))[..., np.newaxis]
+    vecnorm_modified = np.clip(vecnorm, 1e-5, None)
+    vecunit = vector / vecnorm_modified
+    return np.cosh(vecnorm) * base + np.sinh(vecnorm) * vecunit
 
 def log(base, target):
     base, target = check_dim(base, target) 
@@ -125,11 +125,11 @@ def random_radius(base, sigma, type = "rie_normal"):
                     
     return np.vectorize(find)(U)[..., np.newaxis]
 
-def random_riemannian_gaussian(base = None, n_samples = 1, sigma = 1, ignore_n = False):
+def random_riemannian_gaussian(base = None, n_samples = None, sigma = None):
     """base is 1D and the output shape is n_samples x base.shape[-1]"""
     n = check_nsamples(n_samples)
-    base = np.tile(base, n + (1,) * base.ndim) if not ignore_n else base
-    vector = random_vector(base)
+    base = np.tile(base, n + (1,) * base.ndim) 
+    vector = random_vector(base = base)
     radii = random_radius(base = base, sigma = sigma, type = 'rie_normal')
     return exp(base, radii * vector)
 
@@ -164,19 +164,7 @@ def poincare_ball_to_hyperboloid(data):
     z = (1 + np.sum(data ** 2, axis = -1)) / (1 - np.sum(data ** 2, axis = -1)) 
     return np.concatenate((z[..., np.newaxis], w[..., np.newaxis] * data), axis = -1)
 
-def visualize(data, transform_to_poincare_ball = True): 
-    """Visualize the data on the H2"""
-    if transform_to_poincare_ball: 
-        data = hyperboloid_to_poincare_ball(data)
 
-    _, ax = plt.subplots(figsize = (5, 5)) 
-    circle = plt.Circle((0, 0), 1, fill = False, edgecolor = 'black', lw = 2) 
-    ax.add_patch(circle) 
-    ax.scatter(data[:, 0], data[:, 1], color = 'black', s = 40, label = 'Local states') 
-    ax.axis('equal') 
-    ax.set_xlim(-1.02, 1.02) 
-    ax.set_ylim(-1.02, 1.02) 
-    ax.axis('off') 
  
   
 
