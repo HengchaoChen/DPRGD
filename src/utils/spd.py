@@ -28,7 +28,7 @@ def check_dim(base, vector):
 
     return base, vector
 
-# ---------------------- Symmetric positive definite space ---------------------- #
+# ---------------------- SPD matrices ---------------------- #
 
 def dist(base, target, epsilon = 1e-10): 
     """Compute the distance between SPD matrices. 

@@ -1,7 +1,7 @@
 """ 
 Written by: Hengchao Chen
 Version: 0.1
-Last modified date: 2024-09-02
+Last modified date: 2025-03-13
 Description: This file is used to define the module of hyperbolic spaces.
 """
 
@@ -26,32 +26,42 @@ def check_dim(base, vector):
 
     return base, vector
 
+def check_nsamples(n):
+    """Check the type of n and return it as a tuple"""
+    
+    if isinstance(n, int):
+        return (n,)
+    elif isinstance(n, tuple):
+        return n
+    else:
+        raise ValueError("n should be an integer or a tuple of integers")
+
 # ---------------------- Hyperbolic space ---------------------- #
 
 # implement the hyperbolic space using the Hyperboloid model
-
-# check Lectures on Hyperbolic Geometry for mathematical foundations
-
 # visualize the hyperbolic space using the Poincare ball model
 
 def minkowski_dot(v, w): 
     v, w = check_dim(v, w) 
     return - v[..., 0] * w[..., 0] + np.sum(v[..., 1:] * w[..., 1:], axis = -1)
 
-def dist(base, target):
+def minkowski_norm(vector, keepdims = False):
+    """Return the Minkowski norm of the vector on the hyperboloid.
+    When restricted to the tangent space to x in hyperboloid, the Minkowski norm is non-negative.
+    Note that only when the vector is in the tangent space to x, the norm is non-negative."""
+    if np.any(minkowski_dot(vector, vector) < 0):
+        raise ValueError("The input vector is not in the tangent space to the hyperboloid")
+    return np.sqrt(np.clip(minkowski_dot(vector, vector), 0, None)) if not keepdims else np.sqrt(np.clip(minkowski_dot(vector, vector), 0, None))[..., np.newaxis]
 
-    # case 1: base is 1D and target is either 1D or 2D 
-    # case 2: base is 2D and target is 2D 
-    # the output shape is target.shape[:-1]
+def dist(base, target):
+    """
+    Compute the distance between base and target on the hyperboloid.
+    The output shape is target.shape[:-1]""" 
 
     base, target = check_dim(base, target) 
     return np.arccosh(np.clip(- minkowski_dot(base, target), 1, None))
 
 def exp(base, vector):
-
-    # case 1: base is 1D and vector is either 1D or 2D 
-    # case 2: base is 2D and vector is 2D
-
     base, vector = check_dim(base, vector) 
     vector_norm = np.sqrt(minkowski_dot(vector, vector))[..., np.newaxis] 
     vector_norm_modified = np.clip(vector_norm, 1e-5, None) 
@@ -59,11 +69,6 @@ def exp(base, vector):
     return np.cosh(vector_norm) * base + np.sinh(vector_norm) * vector_unit
 
 def log(base, target):
-
-    # case 1: base is 1D and target is either 1D or 2D
-
-    # case 2: base is 2D and target is 2D
-
     base, target = check_dim(base, target) 
     dist_base_target = dist(base, target)[..., np.newaxis] 
     sinh_dist_base_target = np.clip(np.sinh(dist_base_target), 1e-10, None) 
@@ -71,55 +76,70 @@ def log(base, target):
 
 # ---------------------- Random ---------------------- #
 
-# One can manually design other riemannian radial distributions. Here we provide two examples: Riemannian Gaussian distributions, and a distribution on a unit ball.
+# Simulate Riemannian Gaussian distributions, and a distribution on a unit ball.
 
-# We generate random samples on the hyperboloid. 
+def random_vector(base):
+    """Generate random tangent vectors on the hyperboloid to the base point(s)"""
+    directions = np.random.randn(*base.shape)
+    directions = directions + minkowski_dot(directions, base)[..., np.newaxis] * base
+    return directions / minkowski_norm(directions, keepdims = True)
 
-def random_riemannian_gaussian(base = None, n_samples = 1, sigma = 1):
+def random_radius(base, sigma, type = "rie_normal"):
+    """Generate random radii on the hyperboloid according to the riemannian radial distributions. This function is used in sampler.
+        
+    - rie_normal : propto exp(-r^2/(2*sigma^2)) sinh^(dim-1)(r)
+    - rie_laplace : propto exp(-r/sigma) sinh^(dim-1)(r)
+        
+    Use inverse function sampling to sample r in [0, inf). For approximation, we restrict r to [0,20] as we assume that the probability that r>20 is negligible.
+    When dim is high, the quad(f, a, b) is not accurate due to the small values of f and the discrete nature of quad. 
+    Therefore, this limits the use of quad in high-dimensional spherical data analysis.
+    For current implementation, we restrict the dimension to be less than 6.
+        
+    Also, when using rie_laplace, we require the sigma to be small enough to ensure that the distribution is well defined."""
 
-    # base is 1D and the output shape is n_samples x base.shape[-1]
+    if type not in ["rie_normal", "rie_laplace"]:
+        raise ValueError("The type of distribution is not supported at this moment")
+        
+    if base.ndim <= 1:
+        raise ValueError("The input base should have at least two dimensions")
+        
+    dim = base.shape[-1] - 1
+    n = base.shape[:-1]
+    n = check_nsamples(n)
+    U = np.random.rand(*n)
 
-    base = base.reshape(1, -1)
-    dim_embedded = base.shape[-1]
-    directions = np.random.randn(n_samples, dim_embedded)
-    directions_tangent = directions + minkowski_dot(base, directions)[..., np.newaxis] * base
-    directions_tangent_norm = np.sqrt(minkowski_dot(directions_tangent, directions_tangent))
-    directions_tangent = directions_tangent / directions_tangent_norm[..., np.newaxis]
+    if type == "rie_normal":
+        f = lambda r: np.exp(-r ** 2 / (2 * sigma ** 2) + np.log(np.sinh(r)) * (dim - 1)) # when r is large, sinh(r) is approximately exp(r)/2
+    else:
+        f = lambda r: np.exp(-r / sigma + np.log(np.sinh(r)) * (dim - 1)) # when r is large, sinh(r) is approximately exp(r)/2        
+    c = quad(f, 0, 20)[0]
+            
+    def res(r, u):
+        return quad(f, 0, r)[0] - u * c
 
-    # generate random radius from a distribution proportional to e^{-r^2/2\sigma^2} * \sinh^{dim_intrinsic-1}(r), where dim_intrinsic = dim_embedded - 1
+    def find(u):
+        if type == "rie_normal":
+            return root_scalar(res, bracket = [1e-40, 20], args = (u,)).root
+        else:
+            return root_scalar(res, bracket = [1e-40, 20 / (1/sigma - dim)], args = (u,)).root # 1/sigma must be larger than dim - 1 to ensure that the distribution is well defined
+                    
+    return np.vectorize(find)(U)[..., np.newaxis]
 
-    # use np.vectorize to vectorize the functions
-    
-    random_U = np.random.rand(n_samples)
-    def integral(x, u):
+def random_riemannian_gaussian(base = None, n_samples = 1, sigma = 1, ignore_n = False):
+    """base is 1D and the output shape is n_samples x base.shape[-1]"""
+    n = check_nsamples(n_samples)
+    base = np.tile(base, n + (1,) * base.ndim) if not ignore_n else base
+    vector = random_vector(base)
+    radii = random_radius(base = base, sigma = sigma, type = 'rie_normal')
+    return exp(base, radii * vector)
 
-        return quad(lambda t: np.exp(- np.arcsinh(t) ** 2 / (2 * sigma)) * t ** (dim_embedded - 2) * np.sqrt(1 + t ** 2), 0, x)[0] - u
-    roots = np.array([root_scalar(integral, args = (u,), bracket = [0, 10]).root for u in random_U])
-    vectors = directions_tangent * np.arcsinh(roots)[..., np.newaxis]
-    return exp(base, vectors)
-
-def random_uniform(base = None, n_samples = 1, radius = 1):
-
-    # base is 1D and the output shape is n_samples x base.shape[-1]
-
-    base = base.reshape(1, -1) 
-    dim_embedded = base.shape[-1] 
-    directions = np.random.randn(n_samples, dim_embedded) 
-    directions_tangent = directions + minkowski_dot(base, directions)[..., np.newaxis] * base 
-    directions_tangent_norm = np.sqrt(minkowski_dot(directions_tangent, directions_tangent)) 
-    directions_tangent = directions_tangent / directions_tangent_norm[..., np.newaxis] 
-    length = np.random.rand(n_samples) * radius 
-    vectors = directions_tangent * length[..., np.newaxis] 
-    return exp(base, vectors)
-
-
-# ---------------------- Fr\'echet mean ---------------------- #
+# ---------------------- Frechet mean ---------------------- #
 
 def frechet_mean(data, stepsize = 0.1, tol = 1e-6, max_iter = 100):
-
-    # data is 2D and the output shape is 1D
-
-    # output the Frechet mean of the data
+    """
+    Output the Frechet mean of the data on the hyperboloid.
+    
+    Input: 2D data""" 
 
     data_poincare = hyperboloid_to_poincare_ball(data) 
     mean_poincare = np.mean(data_poincare, axis = 0) 
@@ -144,10 +164,8 @@ def poincare_ball_to_hyperboloid(data):
     z = (1 + np.sum(data ** 2, axis = -1)) / (1 - np.sum(data ** 2, axis = -1)) 
     return np.concatenate((z[..., np.newaxis], w[..., np.newaxis] * data), axis = -1)
 
-def visualize(data, transform_to_poincare_ball = True):
-
-    # suitable for H2 space and poincare disk model
-
+def visualize(data, transform_to_poincare_ball = True): 
+    """Visualize the data on the H2"""
     if transform_to_poincare_ball: 
         data = hyperboloid_to_poincare_ball(data)
 
@@ -159,4 +177,16 @@ def visualize(data, transform_to_poincare_ball = True):
     ax.set_xlim(-1.02, 1.02) 
     ax.set_ylim(-1.02, 1.02) 
     ax.axis('off') 
+ 
+  
+
+    
+ 
+     
+     
+    
+   
+    
+    
+         
  
